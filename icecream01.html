@@ -90,22 +90,31 @@
             z-index: 50;
             animation: float 2s ease-in-out infinite;
             transition: left 1.2s cubic-bezier(0.34, 1.56, 0.64, 1),
-                        top 1.2s cubic-bezier(0.34, 1.56, 0.64, 1),
-                        transform 0.3s ease-out;
+                        top 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
             cursor: grab;
+            pointer-events: auto;
+            min-width: 100px;
+            min-height: 100px;
+        }
+        .icecream-container * {
+            pointer-events: none;
         }
         .icecream-container:active {
             cursor: grabbing;
         }
-        .icecream-container.clicked {
-            animation: squish 0.6s ease-out;
+        .icecream-container.bouncing {
+            animation: jelly-bounce 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
-        @keyframes squish {
+        @keyframes jelly-bounce {
             0% { transform: translate(-50%, -50%) scale(1, 1); }
-            25% { transform: translate(-50%, -50%) scale(1.2, 0.8); }
-            50% { transform: translate(-50%, -50%) scale(0.9, 1.1); }
-            75% { transform: translate(-50%, -50%) scale(1.05, 0.95); }
+            20% { transform: translate(-50%, -50%) scale(1.25, 0.75); }
+            40% { transform: translate(-50%, -50%) scale(0.85, 1.15); }
+            60% { transform: translate(-50%, -50%) scale(1.1, 0.9); }
+            80% { transform: translate(-50%, -50%) scale(0.95, 1.05); }
             100% { transform: translate(-50%, -50%) scale(1, 1); }
+        }
+        .icecream-container.stretching {
+            animation: none !important;
         }
         .icecream-container img,
         .icecream-container .crop-wrapper {
@@ -116,14 +125,17 @@
                 transform: translate(-50%, -50%) scale(1) rotate(0deg);
             }
             25% {
-                transform: translate(-50%, -52%) scale(1.05) rotate(-2deg);
+                transform: translate(-50%, -52%) scale(1.04) rotate(-1deg);
             }
             50% {
-                transform: translate(-50%, -48%) scale(0.98) rotate(0deg);
+                transform: translate(-50%, -48%) scale(0.97) rotate(0deg);
             }
             75% {
-                transform: translate(-50%, -51%) scale(1.03) rotate(2deg);
+                transform: translate(-50%, -51%) scale(1.02) rotate(1deg);
             }
+        }
+        .icecream-container:hover {
+            animation-play-state: paused;
         }
         .word-popup {
             position: absolute;
@@ -623,6 +635,7 @@
         let icecreamStartY = 0;
         let containerStartLeft = 0;
         let containerStartTop = 0;
+        let dragContainer = null;
 
         function initIcecreamInteraction() {
             const containers = [
@@ -631,34 +644,57 @@
             ];
 
             containers.forEach(container => {
-                // Click effect
+                // Remove old listeners by cloning
+                const newContainer = container.cloneNode(true);
+                container.parentNode.replaceChild(newContainer, container);
+            });
+
+            // Re-get containers after cloning
+            const container4 = document.getElementById('icecream-frame4');
+            const container5 = document.getElementById('icecream-frame5');
+            const newContainers = [container4, container5];
+
+            newContainers.forEach(container => {
+                // Click/Press effect - jelly bounce
                 container.addEventListener('mousedown', function(e) {
-                    this.classList.add('clicked');
+                    // Remove any existing animation classes
+                    this.classList.remove('bouncing', 'stretching');
+
+                    // Force reflow to restart animation
+                    void this.offsetWidth;
+
+                    // Add bouncing class for jelly effect
+                    this.classList.add('bouncing');
+
                     icecreamDragging = true;
+                    dragContainer = this;
                     icecreamStartX = e.clientX;
                     icecreamStartY = e.clientY;
 
-                    const rect = this.getBoundingClientRect();
-                    const parentRect = this.parentElement.getBoundingClientRect();
                     containerStartLeft = parseFloat(this.style.left) || 38;
                     containerStartTop = parseFloat(this.style.top) || 50;
 
                     e.stopPropagation();
+                    e.preventDefault();
                 });
 
-                container.addEventListener('animationend', function() {
-                    this.classList.remove('clicked');
+                container.addEventListener('animationend', function(e) {
+                    if (e.animationName === 'jelly-bounce') {
+                        this.classList.remove('bouncing');
+                    }
                 });
 
                 // Hover stretch effect
                 container.addEventListener('mouseenter', function() {
                     if (!icecreamDragging) {
-                        this.style.transform = 'translate(-50%, -50%) scale(1.1, 0.95)';
+                        this.style.transition = 'transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+                        this.style.transform = 'translate(-50%, -50%) scale(1.15, 0.9)';
                     }
                 });
 
                 container.addEventListener('mouseleave', function() {
                     if (!icecreamDragging) {
+                        this.style.transition = 'transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
                         this.style.transform = 'translate(-50%, -50%) scale(1, 1)';
                     }
                 });
@@ -666,32 +702,58 @@
 
             // Global mouse move for dragging
             document.addEventListener('mousemove', function(e) {
-                if (icecreamDragging) {
+                if (icecreamDragging && dragContainer) {
                     const deltaX = (e.clientX - icecreamStartX) / window.innerWidth * 100;
                     const deltaY = (e.clientY - icecreamStartY) / window.innerHeight * 100;
 
                     const newLeft = containerStartLeft + deltaX;
                     const newTop = containerStartTop + deltaY;
 
-                    containers.forEach(container => {
+                    // Apply stretching class
+                    newContainers.forEach(container => {
+                        container.classList.add('stretching');
                         container.style.left = newLeft + '%';
                         container.style.top = newTop + '%';
 
-                        // Stretch effect while dragging
-                        const stretchX = 1 + Math.abs(deltaX) * 0.01;
-                        const stretchY = 1 - Math.abs(deltaY) * 0.01;
-                        container.style.transform = `translate(-50%, -50%) scale(${stretchX}, ${stretchY})`;
+                        // Slime stretch effect based on drag direction and distance
+                        const stretchFactorX = 1 + Math.abs(deltaX) * 0.02;
+                        const stretchFactorY = 1 + Math.abs(deltaY) * 0.02;
+
+                        // Compress perpendicular to stretch direction
+                        let scaleX, scaleY;
+                        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                            // Horizontal stretch
+                            scaleX = stretchFactorX;
+                            scaleY = Math.max(0.6, 1 / stretchFactorX);
+                        } else {
+                            // Vertical stretch
+                            scaleY = stretchFactorY;
+                            scaleX = Math.max(0.6, 1 / stretchFactorY);
+                        }
+
+                        container.style.transition = 'none';
+                        container.style.transform = `translate(-50%, -50%) scale(${scaleX}, ${scaleY})`;
                     });
                 }
             });
 
-            // Global mouse up
+            // Global mouse up - bounce back
             document.addEventListener('mouseup', function() {
                 if (icecreamDragging) {
                     icecreamDragging = false;
-                    containers.forEach(container => {
+
+                    newContainers.forEach(container => {
+                        container.classList.remove('stretching');
+                        container.style.transition = 'transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
                         container.style.transform = 'translate(-50%, -50%) scale(1, 1)';
+
+                        // Add a small bounce when released
+                        setTimeout(() => {
+                            container.classList.add('bouncing');
+                        }, 100);
                     });
+
+                    dragContainer = null;
                 }
             });
         }
@@ -704,15 +766,17 @@
             displayIcecream('frame4');
             displayIcecream('frame5');
 
-            // Initialize ice cream interaction (slime effect)
-            initIcecreamInteraction();
-
             // Clear any existing word popups
             document.querySelectorAll('.word-popup').forEach(el => el.remove());
 
             eatCount = 0;
             currentEatFrame = 4;
             showFrame(4);
+
+            // Initialize ice cream interaction after a short delay to ensure DOM is ready
+            setTimeout(() => {
+                initIcecreamInteraction();
+            }, 100);
         }
 
         function toggleEating() {
