@@ -84,14 +84,29 @@
         }
         .icecream-container {
             position: absolute;
-            left: 40%;
+            left: 45%;
             top: 50%;
             transform: translate(-50%, -50%);
             z-index: 50;
+            animation: float 2s ease-in-out infinite;
         }
         .icecream-container img,
         .icecream-container .crop-wrapper {
             position: absolute;
+        }
+        @keyframes float {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1) rotate(0deg);
+            }
+            25% {
+                transform: translate(-50%, -52%) scale(1.05) rotate(-2deg);
+            }
+            50% {
+                transform: translate(-50%, -48%) scale(0.98) rotate(0deg);
+            }
+            75% {
+                transform: translate(-50%, -51%) scale(1.03) rotate(2deg);
+            }
         }
         .word-popup {
             position: absolute;
@@ -511,7 +526,7 @@
             container.innerHTML = '';
 
             // Scale factor to make the icecream bigger in the mouth
-            const scale = 0.9;
+            const scale = 1.1;
 
             capturedIcecream.elements.forEach(item => {
                 const clonedElement = item.element.cloneNode(true);
@@ -590,9 +605,18 @@
             eatCount++;
 
             // Add multiple words as count increases for "explosion" effect
-            const wordsToAdd = Math.min(eatCount, 5); // Add more words as we progress
+            // Last 3 clicks generate even more words
+            let wordsToAdd;
+            if (eatCount >= 8) {
+                wordsToAdd = 8; // Massive explosion at the end
+            } else if (eatCount >= 6) {
+                wordsToAdd = 6; // More words in later stages
+            } else {
+                wordsToAdd = Math.min(eatCount, 5); // Gradual increase
+            }
+
             for (let i = 0; i < wordsToAdd; i++) {
-                setTimeout(() => addWordPopup(), i * 100); // Stagger the explosions
+                setTimeout(() => addWordPopup(), i * 80); // Stagger the explosions
             }
 
             if (eatCount >= 10) {
