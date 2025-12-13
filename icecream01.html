@@ -785,36 +785,44 @@
             // Randomize ice cream position with each toggle
             randomizeIcecreamPosition();
 
-            // Add multiple words as count increases for "explosion" effect
-            // Last 3 clicks generate even more words
+            // Progressive word explosion - gets more intense over time
             let wordsToAdd;
-            if (eatCount >= 8) {
-                wordsToAdd = 8; // Massive explosion at the end
+            let staggerTime;
+
+            if (eatCount >= 20) {
+                wordsToAdd = 15; // Massive explosion
+                staggerTime = 40; // Very fast
+            } else if (eatCount >= 15) {
+                wordsToAdd = 12;
+                staggerTime = 50;
+            } else if (eatCount >= 10) {
+                wordsToAdd = 10;
+                staggerTime = 60;
+            } else if (eatCount >= 8) {
+                wordsToAdd = 8;
+                staggerTime = 70;
             } else if (eatCount >= 6) {
-                wordsToAdd = 6; // More words in later stages
+                wordsToAdd = 6;
+                staggerTime = 80;
+            } else if (eatCount >= 4) {
+                wordsToAdd = 5;
+                staggerTime = 90;
             } else {
-                wordsToAdd = Math.min(eatCount, 5); // Gradual increase
+                wordsToAdd = Math.min(eatCount, 4);
+                staggerTime = 100;
             }
 
             for (let i = 0; i < wordsToAdd; i++) {
-                setTimeout(() => addWordPopup(), i * 80); // Stagger the explosions
+                setTimeout(() => addWordPopup(), i * staggerTime);
             }
 
-            if (eatCount >= 10) {
-                // Return to start but keep all the words
-                eatCount = 0;
-                setTimeout(() => {
-                    document.querySelectorAll('.word-popup').forEach(el => el.remove());
-                    showFrame(1);
-                }, 1000);
+            // Toggle between frames without ever returning to start
+            if (currentEatFrame === 4) {
+                currentEatFrame = 5;
+                showFrame(5);
             } else {
-                if (currentEatFrame === 4) {
-                    currentEatFrame = 5;
-                    showFrame(5);
-                } else {
-                    currentEatFrame = 4;
-                    showFrame(4);
-                }
+                currentEatFrame = 4;
+                showFrame(4);
             }
         }
 
