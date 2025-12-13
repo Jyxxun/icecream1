@@ -84,12 +84,28 @@
         }
         .icecream-container {
             position: absolute;
-            left: 45%;
+            left: 38%;
             top: 50%;
             transform: translate(-50%, -50%);
             z-index: 50;
             animation: float 2s ease-in-out infinite;
-            transition: left 0.5s ease-out, top 0.5s ease-out;
+            transition: left 1.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        top 1.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        transform 0.3s ease-out;
+            cursor: grab;
+        }
+        .icecream-container:active {
+            cursor: grabbing;
+        }
+        .icecream-container.clicked {
+            animation: squish 0.6s ease-out;
+        }
+        @keyframes squish {
+            0% { transform: translate(-50%, -50%) scale(1, 1); }
+            25% { transform: translate(-50%, -50%) scale(1.2, 0.8); }
+            50% { transform: translate(-50%, -50%) scale(0.9, 1.1); }
+            75% { transform: translate(-50%, -50%) scale(1.05, 0.95); }
+            100% { transform: translate(-50%, -50%) scale(1, 1); }
         }
         .icecream-container img,
         .icecream-container .crop-wrapper {
@@ -588,7 +604,7 @@
 
         function randomizeIcecreamPosition() {
             // Random position shift based on eat count
-            const leftShift = 40 + (Math.random() * 15 - 7.5); // 32.5% to 47.5%
+            const leftShift = 33 + (Math.random() * 15 - 7.5); // 25.5% to 40.5%
             const topShift = 45 + (Math.random() * 10 - 5); // 40% to 50%
 
             const container4 = document.getElementById('icecream-frame4');
@@ -601,6 +617,85 @@
             container5.style.top = topShift + '%';
         }
 
+        // Ice cream slime-like interaction
+        let icecreamDragging = false;
+        let icecreamStartX = 0;
+        let icecreamStartY = 0;
+        let containerStartLeft = 0;
+        let containerStartTop = 0;
+
+        function initIcecreamInteraction() {
+            const containers = [
+                document.getElementById('icecream-frame4'),
+                document.getElementById('icecream-frame5')
+            ];
+
+            containers.forEach(container => {
+                // Click effect
+                container.addEventListener('mousedown', function(e) {
+                    this.classList.add('clicked');
+                    icecreamDragging = true;
+                    icecreamStartX = e.clientX;
+                    icecreamStartY = e.clientY;
+
+                    const rect = this.getBoundingClientRect();
+                    const parentRect = this.parentElement.getBoundingClientRect();
+                    containerStartLeft = parseFloat(this.style.left) || 38;
+                    containerStartTop = parseFloat(this.style.top) || 50;
+
+                    e.stopPropagation();
+                });
+
+                container.addEventListener('animationend', function() {
+                    this.classList.remove('clicked');
+                });
+
+                // Hover stretch effect
+                container.addEventListener('mouseenter', function() {
+                    if (!icecreamDragging) {
+                        this.style.transform = 'translate(-50%, -50%) scale(1.1, 0.95)';
+                    }
+                });
+
+                container.addEventListener('mouseleave', function() {
+                    if (!icecreamDragging) {
+                        this.style.transform = 'translate(-50%, -50%) scale(1, 1)';
+                    }
+                });
+            });
+
+            // Global mouse move for dragging
+            document.addEventListener('mousemove', function(e) {
+                if (icecreamDragging) {
+                    const deltaX = (e.clientX - icecreamStartX) / window.innerWidth * 100;
+                    const deltaY = (e.clientY - icecreamStartY) / window.innerHeight * 100;
+
+                    const newLeft = containerStartLeft + deltaX;
+                    const newTop = containerStartTop + deltaY;
+
+                    containers.forEach(container => {
+                        container.style.left = newLeft + '%';
+                        container.style.top = newTop + '%';
+
+                        // Stretch effect while dragging
+                        const stretchX = 1 + Math.abs(deltaX) * 0.01;
+                        const stretchY = 1 - Math.abs(deltaY) * 0.01;
+                        container.style.transform = `translate(-50%, -50%) scale(${stretchX}, ${stretchY})`;
+                    });
+                }
+            });
+
+            // Global mouse up
+            document.addEventListener('mouseup', function() {
+                if (icecreamDragging) {
+                    icecreamDragging = false;
+                    containers.forEach(container => {
+                        container.style.transform = 'translate(-50%, -50%) scale(1, 1)';
+                    });
+                }
+            });
+        }
+
         function startEating() {
             // Capture the icecream assembly
             capturedIcecream = captureIcecream();
@@ -608,6 +703,9 @@
             // Display it in both frames
             displayIcecream('frame4');
             displayIcecream('frame5');
+
+            // Initialize ice cream interaction (slime effect)
+            initIcecreamInteraction();
 
             // Clear any existing word popups
             document.querySelectorAll('.word-popup').forEach(el => el.remove());
