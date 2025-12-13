@@ -84,7 +84,7 @@
         }
         .icecream-container {
             position: absolute;
-            left: 50%;
+            left: 40%;
             top: 50%;
             transform: translate(-50%, -50%);
             z-index: 50;
@@ -380,19 +380,38 @@
             const frame3 = document.getElementById('frame3');
             const draggables = frame3.querySelectorAll('.draggable, .draggable-wrapper');
 
-            let allElements = [];
-            let coneElement = null;
-            let coneBottom = -Infinity;
+            // Define plate area (based on plate, fork, knife positions)
+            const plateArea = {
+                left: 420,
+                right: 995,
+                top: 270,
+                bottom: 625
+            };
 
-            // First pass: Find all elements and identify the cone base
+            let allElements = [];
+            let coneTypes = [];
+            let selectedCone = null;
+
+            // First pass: Find all elements in plate area and identify cone bases
             draggables.forEach(element => {
                 const left = parseFloat(element.style.left) || 0;
                 const top = parseFloat(element.style.top) || 0;
                 const width = element.offsetWidth;
                 const height = element.offsetHeight;
+                const centerX = left + width / 2;
+                const centerY = top + height / 2;
+
+                // Check if element is in plate area (using center point)
+                const inPlateArea = centerX >= plateArea.left &&
+                                   centerX <= plateArea.right &&
+                                   centerY >= plateArea.top &&
+                                   centerY <= plateArea.bottom;
+
+                if (!inPlateArea) return; // Skip elements outside plate area
 
                 // Check if this is a cone element
                 let imgSrc = '';
+                let coneType = null;
                 if (element.classList.contains('draggable')) {
                     imgSrc = element.src;
                 } else if (element.classList.contains('draggable-wrapper')) {
@@ -400,11 +419,16 @@
                     if (img) imgSrc = img.src;
                 }
 
-                // Identify cone/bowl base elements
-                const isCone = imgSrc.includes('c3fbff45-9e50-48b0-ac41-c700d40bca51') || // tall cone
-                              imgSrc.includes('f58ef419-2391-489c-96e4-962657c66b29') || // short cone
-                              imgSrc.includes('a5d6adb3-0b16-4ff1-8a2d-82423150c8ae') || // cropped cone
-                              imgSrc.includes('57b3670f-c0de-4ebd-a21a-cdfdd4bbb654');   // cone bowl
+                // Identify specific cone/bowl base type
+                if (imgSrc.includes('c3fbff45-9e50-48b0-ac41-c700d40bca51')) {
+                    coneType = 'cone';
+                } else if (imgSrc.includes('f58ef419-2391-489c-96e4-962657c66b29')) {
+                    coneType = 'shortcone';
+                } else if (imgSrc.includes('a5d6adb3-0b16-4ff1-8a2d-82423150c8ae')) {
+                    coneType = 'cone2';
+                } else if (imgSrc.includes('57b3670f-c0de-4ebd-a21a-cdfdd4bbb654')) {
+                    coneType = 'conebowl';
+                }
 
                 allElements.push({
                     element: element.cloneNode(true),
@@ -412,63 +436,71 @@
                     top: top,
                     width: width,
                     height: height,
-                    isCone: isCone
+                    coneType: coneType
                 });
 
-                if (isCone) {
-                    const bottom = top + height;
-                    if (bottom > coneBottom) {
-                        coneBottom = bottom;
-                        coneElement = {
-                            left: left,
-                            top: top,
-                            width: width,
-                            height: height,
-                            right: left + width,
-                            bottom: top + height
-                        };
-                    }
+                if (coneType) {
+                    coneTypes.push({
+                        type: coneType,
+                        left: left,
+                        top: top,
+                        width: width,
+                        height: height,
+                        right: left + width,
+                        bottom: top + height
+                    });
                 }
             });
 
-            // If no cone found, return all elements
-            if (!coneElement) {
+            // Rule: Only one cone type allowed
+            if (coneTypes.length === 0) {
+                // No cone found, return empty
                 return {
-                    elements: allElements,
+                    elements: [],
                     baseX: 0,
                     baseY: 0
                 };
             }
 
-            // Second pass: Filter only elements that overlap or are close to the cone
+            // Use the first cone found (bottommost if multiple of same type)
+            let maxBottom = -Infinity;
+            coneTypes.forEach(cone => {
+                if (cone.bottom > maxBottom) {
+                    maxBottom = cone.bottom;
+                    selectedCone = cone;
+                }
+            });
+
+            // Second pass: Filter only the selected cone type and elements close to it
             const assembledElements = [];
             const tolerance = 50; // pixels tolerance for "close enough"
 
             allElements.forEach(el => {
-                if (el.isCone) {
-                    // Always include the cone itself
+                if (el.coneType === selectedCone.type) {
+                    // Include only the selected cone type
                     assembledElements.push(el);
-                } else {
-                    // Check if element overlaps or is close to the cone
+                } else if (!el.coneType) {
+                    // Check if non-cone element overlaps or is close to selected cone
                     const elRight = el.left + el.width;
                     const elBottom = el.top + el.height;
 
                     // Check for overlap or proximity
-                    const horizontalOverlap = !(elRight < coneElement.left - tolerance ||
-                                               el.left > coneElement.right + tolerance);
-                    const verticalClose = !(elBottom < coneElement.top - tolerance ||
-                                          el.top > coneElement.bottom + tolerance);
+                    const horizontalOverlap = !(elRight < selectedCone.left - tolerance ||
+                                               el.left > selectedCone.right + tolerance);
+                    const verticalClose = !(elBottom < selectedCone.top - tolerance ||
+                                          el.top > selectedCone.bottom + tolerance);
 
                     if (horizontalOverlap && verticalClose) {
                         assembledElements.push(el);
                     }
                 }
+                // Skip other cone types (different from selected cone)
             });
 
             return {
                 elements: assembledElements,
-                baseX: coneElement.left,
-                baseY: coneElement.top
+                baseX: selectedCone.left,
+                baseY: selectedCone.top
             };
         }
 
@@ -479,7 +511,7 @@
             container.innerHTML = '';
 
             // Scale factor to make the icecream bigger in the mouth
-            const scale = 0.7;
+            const scale = 0.9;
 
             capturedIcecream.elements.forEach(item => {
                 const clonedElement = item.element.cloneNode(true);
