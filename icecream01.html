@@ -82,6 +82,25 @@
             color: black;
             z-index: 100;
         }
+        .icecream-container {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 50;
+        }
+        .icecream-container img,
+        .icecream-container .crop-wrapper {
+            position: absolute;
+        }
+        .word-popup {
+            position: absolute;
+            font-family: 'Impact', 'Arial Black', sans-serif;
+            font-weight: bold;
+            z-index: 200;
+            pointer-events: none;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
     </style>
 </head>
 <body>
@@ -318,11 +337,13 @@
         
         <!-- Frame 4: Mouth Open -->
         <div id="frame4" class="frame" style="background-image: url('https://www.figma.com/api/mcp/asset/5ad6324b-e8d1-492f-a782-5461bbcd1213'); background-size: cover; background-position: center;">
+            <div id="icecream-frame4" class="icecream-container"></div>
             <button onclick="toggleEating()" style="left: 602px; top: 665px;">Eat Me!</button>
         </div>
-        
+
         <!-- Frame 5: Mouth Closed -->
         <div id="frame5" class="frame" style="background-image: url('https://www.figma.com/api/mcp/asset/9b33751d-eee4-458b-984b-79b7443301c1'); background-size: cover; background-position: center;">
+            <div id="icecream-frame5" class="icecream-container"></div>
             <button onclick="toggleEating()" style="left: 602px; top: 665px;">Eat Me!</button>
         </div>
     </div>
@@ -330,22 +351,180 @@
     <script>
         let eatCount = 0;
         let currentEatFrame = 4;
-        
+        let capturedIcecream = null;
+
+        const words = ['YUM', 'GOOD', 'NICE', 'GREAT', 'EXCITED', 'YUMMY', 'DELICIOUS', 'AMAZING', 'WOW', 'SWEET'];
+        const colors = ['#EEFF00', '#CCFF00', '#39FF14', '#FF2EC4', '#FF00FF', '#00F0FF', '#18FFFF', '#FF6A00', '#B200FF'];
+
         function showFrame(num) {
             document.querySelectorAll('.frame').forEach(f => f.classList.remove('active'));
             document.getElementById('frame' + num).classList.add('active');
         }
-        
+
+        function captureIcecream() {
+            const frame3 = document.getElementById('frame3');
+            const draggables = frame3.querySelectorAll('.draggable, .draggable-wrapper');
+
+            let elements = [];
+            let minX = Infinity, minY = Infinity;
+            let coneBottom = -Infinity;
+            let coneElement = null;
+
+            // Find all draggable elements and identify cone
+            draggables.forEach(element => {
+                const left = parseFloat(element.style.left) || 0;
+                const top = parseFloat(element.style.top) || 0;
+                const width = element.offsetWidth;
+                const height = element.offsetHeight;
+
+                // Check if this is a cone element (by checking the image src)
+                let imgSrc = '';
+                if (element.classList.contains('draggable')) {
+                    imgSrc = element.src;
+                } else if (element.classList.contains('draggable-wrapper')) {
+                    const img = element.querySelector('img');
+                    if (img) imgSrc = img.src;
+                }
+
+                // Identify cone elements by their URLs
+                const isCone = imgSrc.includes('c3fbff45-9e50-48b0-ac41-c700d40bca51') || // tall cone
+                              imgSrc.includes('f58ef419-2391-489c-96e4-962657c66b29') || // short cone
+                              imgSrc.includes('a5d6adb3-0b16-4ff1-8a2d-82423150c8ae');   // cropped cone
+
+                if (isCone) {
+                    const bottom = top + height;
+                    if (bottom > coneBottom) {
+                        coneBottom = bottom;
+                        coneElement = { element, left, top, width, height };
+                    }
+                }
+
+                elements.push({
+                    element: element.cloneNode(true),
+                    left: left,
+                    top: top,
+                    width: width,
+                    height: height,
+                    isCone: isCone
+                });
+
+                minX = Math.min(minX, left);
+                minY = Math.min(minY, top);
+            });
+
+            // If no cone found, use the bottommost element
+            if (!coneElement) {
+                elements.forEach(el => {
+                    const bottom = el.top + el.height;
+                    if (bottom > coneBottom) {
+                        coneBottom = bottom;
+                        coneElement = el;
+                    }
+                });
+            }
+
+            // Use cone as the base reference point
+            const baseX = coneElement ? coneElement.left : minX;
+            const baseY = coneElement ? coneElement.top : minY;
+
+            return {
+                elements: elements,
+                baseX: baseX,
+                baseY: baseY
+            };
+        }
+
+        function displayIcecream(frameId) {
+            if (!capturedIcecream) return;
+
+            const container = document.getElementById('icecream-' + frameId);
+            container.innerHTML = '';
+
+            // Scale factor to make the icecream smaller in the mouth
+            const scale = 0.4;
+
+            capturedIcecream.elements.forEach(item => {
+                const clonedElement = item.element.cloneNode(true);
+                clonedElement.classList.remove('draggable', 'draggable-wrapper');
+                clonedElement.style.cursor = 'default';
+
+                // Position relative to the base (cone)
+                const relativeLeft = (item.left - capturedIcecream.baseX) * scale;
+                const relativeTop = (item.top - capturedIcecream.baseY) * scale;
+
+                clonedElement.style.left = relativeLeft + 'px';
+                clonedElement.style.top = relativeTop + 'px';
+
+                // Scale the element size
+                if (clonedElement.classList.contains('crop-wrapper')) {
+                    clonedElement.style.width = (item.width * scale) + 'px';
+                    clonedElement.style.height = (item.height * scale) + 'px';
+                    const img = clonedElement.querySelector('img');
+                    if (img) {
+                        const imgLeft = parseFloat(img.style.left) || 0;
+                        const imgTop = parseFloat(img.style.top) || 0;
+                        const imgWidth = parseFloat(img.style.width) || img.offsetWidth;
+                        const imgHeight = parseFloat(img.style.height) || img.offsetHeight;
+                        img.style.left = (imgLeft * scale) + 'px';
+                        img.style.top = (imgTop * scale) + 'px';
+                        img.style.width = (imgWidth * scale) + 'px';
+                        img.style.height = (imgHeight * scale) + 'px';
+                    }
+                } else {
+                    clonedElement.style.width = (item.width * scale) + 'px';
+                    clonedElement.style.height = (item.height * scale) + 'px';
+                }
+
+                container.appendChild(clonedElement);
+            });
+        }
+
+        function addWordPopup() {
+            const word = words[Math.floor(Math.random() * words.length)];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            const size = 40 + Math.random() * 60; // 40-100px
+            const angle = -30 + Math.random() * 60; // -30 to 30 degrees
+            const x = Math.random() * 1300; // Random position
+            const y = Math.random() * 600;
+
+            const wordElement = document.createElement('div');
+            wordElement.className = 'word-popup';
+            wordElement.textContent = word;
+            wordElement.style.fontSize = size + 'px';
+            wordElement.style.color = color;
+            wordElement.style.left = x + 'px';
+            wordElement.style.top = y + 'px';
+            wordElement.style.transform = `rotate(${angle}deg)`;
+
+            const currentFrame = document.getElementById('frame' + currentEatFrame);
+            currentFrame.appendChild(wordElement);
+        }
+
         function startEating() {
+            // Capture the icecream assembly
+            capturedIcecream = captureIcecream();
+
+            // Display it in both frames
+            displayIcecream('frame4');
+            displayIcecream('frame5');
+
+            // Clear any existing word popups
+            document.querySelectorAll('.word-popup').forEach(el => el.remove());
+
             eatCount = 0;
             currentEatFrame = 4;
             showFrame(4);
         }
-        
+
         function toggleEating() {
             eatCount++;
-            
+
+            // Add a word popup
+            addWordPopup();
+
             if (eatCount >= 10) {
+                // Clear all word popups before returning to start
+                document.querySelectorAll('.word-popup').forEach(el => el.remove());
                 eatCount = 0;
                 showFrame(1);
             } else {
@@ -358,49 +537,49 @@
                 }
             }
         }
-        
+
         // Drag and drop functionality
         let isDragging = false;
         let currentElement = null;
         let offsetX = 0;
         let offsetY = 0;
-        
+
         function initDragAndDrop() {
             const draggables = document.querySelectorAll('.draggable, .draggable-wrapper');
-            
+
             draggables.forEach(element => {
                 element.addEventListener('mousedown', function(e) {
                     isDragging = true;
                     currentElement = this;
-                    
+
                     const rect = this.getBoundingClientRect();
                     const containerRect = this.closest('.frame').getBoundingClientRect();
-                    
+
                     offsetX = e.clientX - rect.left;
                     offsetY = e.clientY - rect.top;
-                    
+
                     e.preventDefault();
                 });
             });
-            
+
             document.addEventListener('mousemove', function(e) {
                 if (isDragging && currentElement) {
                     const containerRect = currentElement.closest('.frame').getBoundingClientRect();
-                    
+
                     let newLeft = e.clientX - containerRect.left - offsetX;
                     let newTop = e.clientY - containerRect.top - offsetY;
-                    
+
                     currentElement.style.left = newLeft + 'px';
                     currentElement.style.top = newTop + 'px';
                 }
             });
-            
+
             document.addEventListener('mouseup', function() {
                 isDragging = false;
                 currentElement = null;
             });
         }
-        
+
         // Initialize drag and drop when page loads
         window.addEventListener('load', initDragAndDrop);
     </script>
