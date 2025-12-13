@@ -100,6 +100,21 @@
             z-index: 200;
             pointer-events: none;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: explode 0.8s ease-out forwards;
+        }
+        @keyframes explode {
+            0% {
+                transform: scale(0) rotate(0deg);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.3) rotate(var(--rotation));
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1) rotate(var(--rotation)) translateY(-20px);
+                opacity: 1;
+            }
         }
     </style>
 </head>
@@ -365,19 +380,18 @@
             const frame3 = document.getElementById('frame3');
             const draggables = frame3.querySelectorAll('.draggable, .draggable-wrapper');
 
-            let elements = [];
-            let minX = Infinity, minY = Infinity;
-            let coneBottom = -Infinity;
+            let allElements = [];
             let coneElement = null;
+            let coneBottom = -Infinity;
 
-            // Find all draggable elements and identify cone
+            // First pass: Find all elements and identify the cone base
             draggables.forEach(element => {
                 const left = parseFloat(element.style.left) || 0;
                 const top = parseFloat(element.style.top) || 0;
                 const width = element.offsetWidth;
                 const height = element.offsetHeight;
 
-                // Check if this is a cone element (by checking the image src)
+                // Check if this is a cone element
                 let imgSrc = '';
                 if (element.classList.contains('draggable')) {
                     imgSrc = element.src;
@@ -386,20 +400,13 @@
                     if (img) imgSrc = img.src;
                 }
 
-                // Identify cone elements by their URLs
+                // Identify cone/bowl base elements
                 const isCone = imgSrc.includes('c3fbff45-9e50-48b0-ac41-c700d40bca51') || // tall cone
                               imgSrc.includes('f58ef419-2391-489c-96e4-962657c66b29') || // short cone
-                              imgSrc.includes('a5d6adb3-0b16-4ff1-8a2d-82423150c8ae');   // cropped cone
+                              imgSrc.includes('a5d6adb3-0b16-4ff1-8a2d-82423150c8ae') || // cropped cone
+                              imgSrc.includes('57b3670f-c0de-4ebd-a21a-cdfdd4bbb654');   // cone bowl
 
-                if (isCone) {
-                    const bottom = top + height;
-                    if (bottom > coneBottom) {
-                        coneBottom = bottom;
-                        coneElement = { element, left, top, width, height };
-                    }
-                }
-
-                elements.push({
+                allElements.push({
                     element: element.cloneNode(true),
                     left: left,
                     top: top,
@@ -408,29 +415,60 @@
                     isCone: isCone
                 });
 
-                minX = Math.min(minX, left);
-                minY = Math.min(minY, top);
-            });
-
-            // If no cone found, use the bottommost element
-            if (!coneElement) {
-                elements.forEach(el => {
-                    const bottom = el.top + el.height;
+                if (isCone) {
+                    const bottom = top + height;
                     if (bottom > coneBottom) {
                         coneBottom = bottom;
-                        coneElement = el;
+                        coneElement = {
+                            left: left,
+                            top: top,
+                            width: width,
+                            height: height,
+                            right: left + width,
+                            bottom: top + height
+                        };
                     }
-                });
+                }
+            });
+
+            // If no cone found, return all elements
+            if (!coneElement) {
+                return {
+                    elements: allElements,
+                    baseX: 0,
+                    baseY: 0
+                };
             }
 
-            // Use cone as the base reference point
-            const baseX = coneElement ? coneElement.left : minX;
-            const baseY = coneElement ? coneElement.top : minY;
+            // Second pass: Filter only elements that overlap or are close to the cone
+            const assembledElements = [];
+            const tolerance = 50; // pixels tolerance for "close enough"
+
+            allElements.forEach(el => {
+                if (el.isCone) {
+                    // Always include the cone itself
+                    assembledElements.push(el);
+                } else {
+                    // Check if element overlaps or is close to the cone
+                    const elRight = el.left + el.width;
+                    const elBottom = el.top + el.height;
+
+                    // Check for overlap or proximity
+                    const horizontalOverlap = !(elRight < coneElement.left - tolerance ||
+                                               el.left > coneElement.right + tolerance);
+                    const verticalClose = !(elBottom < coneElement.top - tolerance ||
+                                          el.top > coneElement.bottom + tolerance);
+
+                    if (horizontalOverlap && verticalClose) {
+                        assembledElements.push(el);
+                    }
+                }
+            });
 
             return {
-                elements: elements,
-                baseX: baseX,
-                baseY: baseY
+                elements: assembledElements,
+                baseX: coneElement.left,
+                baseY: coneElement.top
             };
         }
 
@@ -440,8 +478,8 @@
             const container = document.getElementById('icecream-' + frameId);
             container.innerHTML = '';
 
-            // Scale factor to make the icecream smaller in the mouth
-            const scale = 0.4;
+            // Scale factor to make the icecream bigger in the mouth
+            const scale = 0.7;
 
             capturedIcecream.elements.forEach(item => {
                 const clonedElement = item.element.cloneNode(true);
@@ -482,10 +520,10 @@
         function addWordPopup() {
             const word = words[Math.floor(Math.random() * words.length)];
             const color = colors[Math.floor(Math.random() * colors.length)];
-            const size = 40 + Math.random() * 60; // 40-100px
-            const angle = -30 + Math.random() * 60; // -30 to 30 degrees
-            const x = Math.random() * 1300; // Random position
-            const y = Math.random() * 600;
+            const size = 40 + Math.random() * 80; // 40-120px - increased size
+            const angle = -45 + Math.random() * 90; // -45 to 45 degrees
+            const x = 100 + Math.random() * 1200; // Random position with margin
+            const y = 50 + Math.random() * 600;
 
             const wordElement = document.createElement('div');
             wordElement.className = 'word-popup';
@@ -494,7 +532,7 @@
             wordElement.style.color = color;
             wordElement.style.left = x + 'px';
             wordElement.style.top = y + 'px';
-            wordElement.style.transform = `rotate(${angle}deg)`;
+            wordElement.style.setProperty('--rotation', angle + 'deg');
 
             const currentFrame = document.getElementById('frame' + currentEatFrame);
             currentFrame.appendChild(wordElement);
@@ -519,14 +557,19 @@
         function toggleEating() {
             eatCount++;
 
-            // Add a word popup
-            addWordPopup();
+            // Add multiple words as count increases for "explosion" effect
+            const wordsToAdd = Math.min(eatCount, 5); // Add more words as we progress
+            for (let i = 0; i < wordsToAdd; i++) {
+                setTimeout(() => addWordPopup(), i * 100); // Stagger the explosions
+            }
 
             if (eatCount >= 10) {
-                // Clear all word popups before returning to start
-                document.querySelectorAll('.word-popup').forEach(el => el.remove());
+                // Return to start but keep all the words
                 eatCount = 0;
-                showFrame(1);
+                setTimeout(() => {
+                    document.querySelectorAll('.word-popup').forEach(el => el.remove());
+                    showFrame(1);
+                }, 1000);
             } else {
                 if (currentEatFrame === 4) {
                     currentEatFrame = 5;
