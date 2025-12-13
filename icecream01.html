@@ -89,6 +89,7 @@
             transform: translate(-50%, -50%);
             z-index: 50;
             animation: float 2s ease-in-out infinite;
+            transition: left 0.5s ease-out, top 0.5s ease-out;
         }
         .icecream-container img,
         .icecream-container .crop-wrapper {
@@ -526,7 +527,7 @@
             container.innerHTML = '';
 
             // Scale factor to make the icecream bigger in the mouth
-            const scale = 1.1;
+            const scale = 1.4;
 
             capturedIcecream.elements.forEach(item => {
                 const clonedElement = item.element.cloneNode(true);
@@ -585,6 +586,21 @@
             currentFrame.appendChild(wordElement);
         }
 
+        function randomizeIcecreamPosition() {
+            // Random position shift based on eat count
+            const leftShift = 40 + (Math.random() * 15 - 7.5); // 32.5% to 47.5%
+            const topShift = 45 + (Math.random() * 10 - 5); // 40% to 50%
+
+            const container4 = document.getElementById('icecream-frame4');
+            const container5 = document.getElementById('icecream-frame5');
+
+            container4.style.left = leftShift + '%';
+            container4.style.top = topShift + '%';
+
+            container5.style.left = leftShift + '%';
+            container5.style.top = topShift + '%';
+        }
+
         function startEating() {
             // Capture the icecream assembly
             capturedIcecream = captureIcecream();
@@ -603,6 +619,9 @@
 
         function toggleEating() {
             eatCount++;
+
+            // Randomize ice cream position with each toggle
+            randomizeIcecreamPosition();
 
             // Add multiple words as count increases for "explosion" effect
             // Last 3 clicks generate even more words
