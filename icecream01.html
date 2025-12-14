@@ -137,6 +137,41 @@
         .icecream-container:hover {
             animation-play-state: paused;
         }
+        .shake {
+            animation: shake 3s ease-in-out infinite;
+        }
+        @keyframes shake {
+            0%, 100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            10% {
+                transform: translate(-1px, -1px) rotate(-0.5deg);
+            }
+            20% {
+                transform: translate(1px, 1px) rotate(0.5deg);
+            }
+            30% {
+                transform: translate(-1px, 0) rotate(-0.3deg);
+            }
+            40% {
+                transform: translate(1px, -1px) rotate(0.3deg);
+            }
+            50% {
+                transform: translate(-1px, 1px) rotate(-0.4deg);
+            }
+            60% {
+                transform: translate(1px, 0) rotate(0.4deg);
+            }
+            70% {
+                transform: translate(-1px, -1px) rotate(-0.2deg);
+            }
+            80% {
+                transform: translate(1px, 1px) rotate(0.2deg);
+            }
+            90% {
+                transform: translate(0, -1px) rotate(-0.1deg);
+            }
+        }
         .word-popup {
             position: absolute;
             font-family: 'Impact', 'Arial Black', sans-serif;
@@ -167,64 +202,64 @@
         <!-- Frame 1: Title Screen -->
         <div id="frame1" class="frame active" style="background-image: url('https://www.figma.com/api/mcp/asset/3b2db263-a9b9-43f7-a9cf-4087d2c66f10'); background-size: cover; background-position: center;">
             <!-- ICE CREAM letters -->
-            <img src="https://www.figma.com/api/mcp/asset/0f60287f-3728-457d-ba1a-0564f15dd15b" style="left: 202px; top: 217px; width: 131px; height: 156px;">
-            
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/0f60287f-3728-457d-ba1a-0564f15dd15b" style="left: 202px; top: 217px; width: 131px; height: 156px;">
+
             <!-- C with crop -->
-            <div class="crop-wrapper" style="left: 330px; top: 126px; width: 160px; height: 175px;">
+            <div class="crop-wrapper shake" style="left: 330px; top: 126px; width: 160px; height: 175px;">
                 <img src="https://www.figma.com/api/mcp/asset/fa25ddc4-a8f2-43af-b4c4-dd4a07449992" style="left: -349px; top: -11px; width: 690px; height: 738px;">
             </div>
-            
+
             <!-- E -->
-            <img src="https://www.figma.com/api/mcp/asset/5b8846b7-dd7b-49d0-b6c3-53cf5c5d84e1" style="left: 508px; top: 165px; width: 103px; height: 148px;">
-            
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/5b8846b7-dd7b-49d0-b6c3-53cf5c5d84e1" style="left: 508px; top: 165px; width: 103px; height: 148px;">
+
             <!-- C with crop -->
-            <div class="crop-wrapper" style="left: 705px; top: 172px; width: 105px; height: 153px;">
+            <div class="crop-wrapper shake" style="left: 705px; top: 172px; width: 105px; height: 153px;">
                 <img src="https://www.figma.com/api/mcp/asset/fa25ddc4-a8f2-43af-b4c4-dd4a07449992" style="left: -229px; top: -10px; width: 453px; height: 645px;">
             </div>
-            
-            <img src="https://www.figma.com/api/mcp/asset/e690b521-e74f-4c84-ab9a-ba629b715a5a" style="left: 811px; top: 136px; width: 109px; height: 169px;">
-            
+
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/e690b521-e74f-4c84-ab9a-ba629b715a5a" style="left: 811px; top: 136px; width: 109px; height: 169px;">
+
             <!-- E -->
-            <img src="https://www.figma.com/api/mcp/asset/5b8846b7-dd7b-49d0-b6c3-53cf5c5d84e1" style="left: 944px; top: 144px; width: 120px; height: 173px;">
-            
-            <img src="https://www.figma.com/api/mcp/asset/20e189bd-1638-4853-bbde-742faa44a606" style="left: 1071px; top: 140px; width: 134px; height: 173px;">
-            <img src="https://www.figma.com/api/mcp/asset/11b4d931-3132-4508-a475-4528ba264280" style="left: 1185px; top: 196px; width: 160px; height: 139px;">
-            
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/5b8846b7-dd7b-49d0-b6c3-53cf5c5d84e1" style="left: 944px; top: 144px; width: 120px; height: 173px;">
+
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/20e189bd-1638-4853-bbde-742faa44a606" style="left: 1071px; top: 140px; width: 134px; height: 173px;">
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/11b4d931-3132-4508-a475-4528ba264280" style="left: 1185px; top: 196px; width: 160px; height: 139px;">
+
             <!-- FACTORY letters -->
-            <img src="https://www.figma.com/api/mcp/asset/30e17baa-2bfa-4d39-a2dd-06c84ee790f1" style="left: 318px; top: 435px; width: 113px; height: 162px;">
-            <img src="https://www.figma.com/api/mcp/asset/400a62b6-c7da-43fa-a33b-0850031ddbe2" style="left: 431px; top: 399px; width: 147px; height: 129px;">
-            
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/30e17baa-2bfa-4d39-a2dd-06c84ee790f1" style="left: 318px; top: 435px; width: 113px; height: 162px;">
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/400a62b6-c7da-43fa-a33b-0850031ddbe2" style="left: 431px; top: 399px; width: 147px; height: 129px;">
+
             <!-- C2 -->
-            <img src="https://www.figma.com/api/mcp/asset/05bd3066-0060-4ed1-9fe9-76f3d0894283" style="left: 589px; top: 444px; width: 81px; height: 118px;">
-            
-            <img src="https://www.figma.com/api/mcp/asset/8a564e8d-d036-48a1-bb12-b66bc1b581c0" style="left: 674px; top: 392px; width: 148px; height: 154px;">
-            
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/05bd3066-0060-4ed1-9fe9-76f3d0894283" style="left: 589px; top: 444px; width: 81px; height: 118px;">
+
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/8a564e8d-d036-48a1-bb12-b66bc1b581c0" style="left: 674px; top: 392px; width: 148px; height: 154px;">
+
             <!-- O with crop -->
-            <div class="crop-wrapper" style="left: 762px; top: 453px; width: 147px; height: 122px;">
+            <div class="crop-wrapper shake" style="left: 762px; top: 453px; width: 147px; height: 122px;">
                 <img src="https://www.figma.com/api/mcp/asset/51f62e77-e46d-4dc5-82d1-8dfc24563641" style="left: -95px; top: -392px; width: 481px; height: 514px;">
             </div>
-            
-            <img src="https://www.figma.com/api/mcp/asset/e690b521-e74f-4c84-ab9a-ba629b715a5a" style="left: 907px; top: 415px; width: 79px; height: 131px;">
-            <img src="https://www.figma.com/api/mcp/asset/efa385cd-28bf-4b07-99a5-bee494bd0210" style="left: 1007px; top: 444px; width: 173px; height: 146px;">
-            
+
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/e690b521-e74f-4c84-ab9a-ba629b715a5a" style="left: 907px; top: 415px; width: 79px; height: 131px;">
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/efa385cd-28bf-4b07-99a5-bee494bd0210" style="left: 1007px; top: 444px; width: 173px; height: 146px;">
+
             <!-- Decorations -->
-            <img src="https://www.figma.com/api/mcp/asset/ca821d00-43c3-41b0-b927-2d6deffa677c" style="left: 20px; top: 575px; width: 154px; height: 171px;">
-            <img src="https://www.figma.com/api/mcp/asset/86bccce3-9bcf-472e-84de-51c9c0593005" style="left: 1297px; top: 25px; width: 166px; height: 146px;">
-            <img src="https://www.figma.com/api/mcp/asset/cb7dfb33-f39c-47df-a337-243eeb68f137" style="left: 1361px; top: 438px; width: 96px; height: 90px;">
-            <img src="https://www.figma.com/api/mcp/asset/6bf84b62-6ad2-4685-8b32-450bbb319666" style="left: 1238px; top: 703px; width: 91px; height: 86px;">
-            <img src="https://www.figma.com/api/mcp/asset/12decb22-50cc-4d44-b3d3-d65d50a2bd4c" style="left: 20px; top: 406px; width: 91px; height: 89px;">
-            <img src="https://www.figma.com/api/mcp/asset/b93b80f5-8a3a-4fd3-a4f9-c87a37f11a52" style="left: 173px; top: 646px; width: 110px; height: 114px;">
-            <img src="https://www.figma.com/api/mcp/asset/b9c7d748-c5f9-4f61-95b2-96850ce4187a" style="left: 20px; top: 34px; width: 143px; height: 139px;">
-            <img src="https://www.figma.com/api/mcp/asset/47a5607d-1107-404e-a0e7-79acd5cc7889" style="left: 1216px; top: 16px; width: 81px; height: 73px;">
-            <img src="https://www.figma.com/api/mcp/asset/8de5ad2f-a44f-4073-adae-a6667538fa37" style="left: 127px; top: 255px; width: 52px; height: 51px;">
-            <img src="https://www.figma.com/api/mcp/asset/8da81328-33d1-451f-82c6-4c073ffaef61" style="left: 1160px; top: 325px; width: 49px; height: 47px;">
-            <img src="https://www.figma.com/api/mcp/asset/ab34b06e-d97b-42d4-8ee8-6fd980c4ef22" style="left: 199px; top: 67px; width: 38px; height: 38px;">
-            <img src="https://www.figma.com/api/mcp/asset/34b44644-c6fd-45ec-84cd-90a5907d32fb" style="left: 1256px; top: 570px; width: 122px; height: 118px;">
-            <img src="https://www.figma.com/api/mcp/asset/a4ab2d7a-45ae-4351-8e04-7cf17fff9bb2" style="left: 147px; top: 419px; width: 83px; height: 94px;">
-            <img src="https://www.figma.com/api/mcp/asset/bf837362-e314-4fdc-9ab4-62bf914d0835" style="left: 20px; top: 234px; width: 71px; height: 92px;">
-            <img src="https://www.figma.com/api/mcp/asset/436f3598-a0ff-4a7d-83f9-503a4375ea2b" style="left: 1353px; top: 600px; width: 152px; height: 152px;">
-            <img src="https://www.figma.com/api/mcp/asset/6bf84b62-6ad2-4685-8b32-450bbb319666" style="left: 537px; top: 538px; width: 52px; height: 48px;">
-            
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/ca821d00-43c3-41b0-b927-2d6deffa677c" style="left: 20px; top: 575px; width: 154px; height: 171px;">
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/86bccce3-9bcf-472e-84de-51c9c0593005" style="left: 1297px; top: 25px; width: 166px; height: 146px;">
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/cb7dfb33-f39c-47df-a337-243eeb68f137" style="left: 1361px; top: 438px; width: 96px; height: 90px;">
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/6bf84b62-6ad2-4685-8b32-450bbb319666" style="left: 1238px; top: 703px; width: 91px; height: 86px;">
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/12decb22-50cc-4d44-b3d3-d65d50a2bd4c" style="left: 20px; top: 406px; width: 91px; height: 89px;">
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/b93b80f5-8a3a-4fd3-a4f9-c87a37f11a52" style="left: 173px; top: 646px; width: 110px; height: 114px;">
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/b9c7d748-c5f9-4f61-95b2-96850ce4187a" style="left: 20px; top: 34px; width: 143px; height: 139px;">
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/47a5607d-1107-404e-a0e7-79acd5cc7889" style="left: 1216px; top: 16px; width: 81px; height: 73px;">
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/8de5ad2f-a44f-4073-adae-a6667538fa37" style="left: 127px; top: 255px; width: 52px; height: 51px;">
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/8da81328-33d1-451f-82c6-4c073ffaef61" style="left: 1160px; top: 325px; width: 49px; height: 47px;">
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/ab34b06e-d97b-42d4-8ee8-6fd980c4ef22" style="left: 199px; top: 67px; width: 38px; height: 38px;">
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/34b44644-c6fd-45ec-84cd-90a5907d32fb" style="left: 1256px; top: 570px; width: 122px; height: 118px;">
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/a4ab2d7a-45ae-4351-8e04-7cf17fff9bb2" style="left: 147px; top: 419px; width: 83px; height: 94px;">
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/bf837362-e314-4fdc-9ab4-62bf914d0835" style="left: 20px; top: 234px; width: 71px; height: 92px;">
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/436f3598-a0ff-4a7d-83f9-503a4375ea2b" style="left: 1353px; top: 600px; width: 152px; height: 152px;">
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/6bf84b62-6ad2-4685-8b32-450bbb319666" style="left: 537px; top: 538px; width: 52px; height: 48px;">
+
             <button onclick="showFrame(2)" style="left: 602px; top: 665px;">Start</button>
         </div>
         
@@ -232,25 +267,25 @@
         <div id="frame2" class="frame">
             <!-- Background -->
             <img src="https://www.figma.com/api/mcp/asset/35f9c510-aeea-4a5e-bbd4-fbc317e8b95d" style="left: -21px; top: -75px; width: 1535px; height: 864px;">
-            
+
             <!-- Star background -->
             <img src="https://www.figma.com/api/mcp/asset/831476f3-b807-409e-b2c7-05c03db51dd6" style="left: -165px; top: -450px; width: 1833px; height: 1562px; opacity: 0.3;">
-            
+
             <!-- Paper/envelope -->
-            <img src="https://www.figma.com/api/mcp/asset/2e18f3e3-7a3a-436c-896a-46c269bd0155" style="left: 423px; top: -24px; width: 646px; height: 762px; filter: drop-shadow(14px 5px 22.6px rgba(0,0,0,0.25));">
-            
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/2e18f3e3-7a3a-436c-896a-46c269bd0155" style="left: 423px; top: -24px; width: 646px; height: 762px; filter: drop-shadow(14px 5px 22.6px rgba(0,0,0,0.25));">
+
             <!-- Decorations -->
-            <img src="https://www.figma.com/api/mcp/asset/9cb1022b-eee4-4c76-8bbb-e0c24cf3da21" style="left: 343px; top: 134px; width: 84px; height: 105px;">
-            <img src="https://www.figma.com/api/mcp/asset/6ea2ca68-40e3-42ad-a804-d9b1271def34" style="left: 1088px; top: 268px; width: 111px; height: 106px;">
-            <img src="https://www.figma.com/api/mcp/asset/bb9c8c8b-1421-4a30-b539-9ae783144c5c" style="left: 334px; top: 438px; width: 111px; height: 104px;">
-            <img src="https://www.figma.com/api/mcp/asset/5e49858c-55a8-49fd-884c-87b8807399ed" style="left: 1107px; top: 529px; width: 95px; height: 100px;">
-            <img src="https://www.figma.com/api/mcp/asset/a09887be-4ff2-4ce1-ab3e-4029480a5adb" style="left: 984px; top: 647px; width: 170px; height: 129px;">
-            <img src="https://www.figma.com/api/mcp/asset/54b33214-49b2-434e-b83a-436c1bdb1bc4" style="left: 394px; top: 581px; width: 52px; height: 48px;">
-            
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/9cb1022b-eee4-4c76-8bbb-e0c24cf3da21" style="left: 343px; top: 134px; width: 84px; height: 105px;">
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/6ea2ca68-40e3-42ad-a804-d9b1271def34" style="left: 1088px; top: 268px; width: 111px; height: 106px;">
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/bb9c8c8b-1421-4a30-b539-9ae783144c5c" style="left: 334px; top: 438px; width: 111px; height: 104px;">
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/5e49858c-55a8-49fd-884c-87b8807399ed" style="left: 1107px; top: 529px; width: 95px; height: 100px;">
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/a09887be-4ff2-4ce1-ab3e-4029480a5adb" style="left: 984px; top: 647px; width: 170px; height: 129px;">
+            <img class="shake" src="https://www.figma.com/api/mcp/asset/54b33214-49b2-434e-b83a-436c1bdb1bc4" style="left: 394px; top: 581px; width: 52px; height: 48px;">
+
             <div class="text" style="left: 517px; top: 240px; width: 457px; text-align: center; font-size: 32px; line-height: 1.3;">
                 Make your own ice cream<br>and then eat it!!
             </div>
-            
+
             <button onclick="showFrame(3)" style="left: 602px; top: 665px;">NEXT</button>
         </div>
         
