@@ -407,8 +407,13 @@
         </div>
     </div>
 
-    <!-- Background audio -->
-    <audio id="zombiesAudio" preload="auto">
+    <!-- Background audio for main screens (Frame 1, 2, 3) -->
+    <audio id="backgroundMusic" preload="auto" loop>
+        <source src="game-music-loop-7-145285.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Eating audio for mouth frames (Frame 4, 5) -->
+    <audio id="zombiesAudio" preload="auto" loop>
         <source src="zombies.mp3" type="audio/mpeg">
     </audio>
 
@@ -417,6 +422,7 @@
         let currentEatFrame = 4;
         let capturedIcecream = null;
         let zombiesAudio = null;
+        let backgroundMusic = null;
 
         const words = ['YUM', 'GOOD', 'NICE', 'GREAT', 'EXCITED', 'YUMMY', 'DELICIOUS', 'AMAZING', 'WOW', 'SWEET'];
         const colors = ['#EEFF00', '#CCFF00', '#39FF14', '#FF2EC4', '#FF00FF', '#00F0FF', '#18FFFF', '#FF6A00', '#B200FF'];
@@ -779,10 +785,15 @@
             currentEatFrame = 4;
             showFrame(4);
 
-            // Initialize audio
+            // Stop background music and start zombies audio
+            if (backgroundMusic) {
+                backgroundMusic.pause();
+                backgroundMusic.currentTime = 0;
+            }
+
+            // Initialize zombies audio
             zombiesAudio = document.getElementById('zombiesAudio');
             if (zombiesAudio) {
-                zombiesAudio.loop = true; // Loop the audio
                 zombiesAudio.volume = 0.5; // Set volume to 50%
             }
 
@@ -889,7 +900,24 @@
         }
 
         // Initialize drag and drop when page loads
-        window.addEventListener('load', initDragAndDrop);
+        window.addEventListener('load', function() {
+            initDragAndDrop();
+
+            // Initialize and play background music
+            backgroundMusic = document.getElementById('backgroundMusic');
+            if (backgroundMusic) {
+                backgroundMusic.volume = 0.4; // Set volume to 40%
+                // Try to play, handle autoplay restrictions
+                backgroundMusic.play().catch(err => {
+                    console.log('Background music autoplay prevented:', err);
+                    // Add click handler to start music on first user interaction
+                    document.addEventListener('click', function startMusic() {
+                        backgroundMusic.play();
+                        document.removeEventListener('click', startMusic);
+                    }, { once: true });
+                });
+            }
+        });
     </script>
 </body>
 </html>
