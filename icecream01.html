@@ -171,6 +171,27 @@
                 opacity: 1;
             }
         }
+        .swipe-hint {
+            position: absolute;
+            left: 50%;
+            bottom: 100px;
+            transform: translateX(-50%);
+            font-family: 'Arial', sans-serif;
+            font-size: 28px;
+            font-weight: bold;
+            color: #ffffff;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+            z-index: 150;
+            animation: blink 1.5s ease-in-out infinite;
+        }
+        @keyframes blink {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
+        }
     </style>
 </head>
 <body>
@@ -408,6 +429,7 @@
         <!-- Frame 4: Mouth Open -->
         <div id="frame4" class="frame" style="background-image: url('https://www.figma.com/api/mcp/asset/5ad6324b-e8d1-492f-a782-5461bbcd1213'); background-size: cover; background-position: center;">
             <div id="icecream-frame4" class="icecream-container"></div>
+            <div class="swipe-hint">Swipe up and down to eat^^</div>
         </div>
 
         <!-- Frame 5: Mouth Closed -->
@@ -1004,6 +1026,7 @@
             // Add mouse wheel scroll interaction for eating frames
             let isScrolling = false;
             let scrollTimeout;
+            let hasScrolledOnce = false;
 
             window.addEventListener('wheel', function(e) {
                 // Only respond to scroll when in eating mode (frame 4 or 5)
@@ -1024,6 +1047,15 @@
 
                 isScrolling = true;
 
+                // Hide the swipe hint after first scroll
+                if (!hasScrolledOnce) {
+                    const swipeHint = document.querySelector('.swipe-hint');
+                    if (swipeHint) {
+                        swipeHint.style.display = 'none';
+                    }
+                    hasScrolledOnce = true;
+                }
+
                 // Toggle eating on any scroll (up or down)
                 toggleEating();
 
@@ -1031,7 +1063,7 @@
                 clearTimeout(scrollTimeout);
                 scrollTimeout = setTimeout(() => {
                     isScrolling = false;
-                }, 300); // 300ms cooldown between toggles
+                }, 700); // 700ms cooldown between toggles
             }, { passive: false });
         });
     </script>
