@@ -64,19 +64,21 @@
         button {
             position: absolute;
             background: #5eff00;
-            border: 4px solid #000;
-            border-radius: 55% 45% 48% 52% / 52% 48% 52% 48%;
+            border: none;
+            border-radius: 8px;
             padding: 12px 50px;
             font-size: 32px;
             font-family: 'American Typewriter', monospace;
             font-weight: bold;
             cursor: pointer;
             z-index: 1000;
-            box-shadow: 3px 3px 0px rgba(0,0,0,0.3);
+            filter: url(#squiggly);
+            box-shadow:
+                0 0 0 4px #000,
+                3px 3px 0px rgba(0,0,0,0.3);
         }
         button:hover {
             background: #4ed000;
-            border-radius: 48% 52% 55% 45% / 48% 52% 48% 52%;
         }
         .text {
             position: absolute;
@@ -222,6 +224,16 @@
     </style>
 </head>
 <body>
+    <!-- SVG filter for hand-drawn style borders -->
+    <svg style="position: absolute; width: 0; height: 0;">
+        <defs>
+            <filter id="squiggly">
+                <feTurbulence id="turbulence" baseFrequency="0.02" numOctaves="3" result="noise" seed="2" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" />
+            </filter>
+        </defs>
+    </svg>
+
     <div class="container">
         <!-- Frame 1: Title Screen -->
         <div id="frame1" class="frame active" style="background-image: url('https://www.figma.com/api/mcp/asset/3b2db263-a9b9-43f7-a9cf-4087d2c66f10'); background-size: cover; background-position: center;">
