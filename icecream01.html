@@ -65,7 +65,7 @@
             position: absolute;
             background: #5eff00;
             border: none;
-            border-radius: 8px;
+            border-radius: 15px;
             padding: 12px 50px;
             font-size: 32px;
             font-family: 'American Typewriter', monospace;
@@ -228,8 +228,8 @@
     <svg style="position: absolute; width: 0; height: 0;">
         <defs>
             <filter id="squiggly">
-                <feTurbulence id="turbulence" baseFrequency="0.02" numOctaves="3" result="noise" seed="2" />
-                <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" />
+                <feTurbulence id="turbulence" baseFrequency="0.05" numOctaves="4" result="noise" seed="2" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="6" />
             </filter>
         </defs>
     </svg>
