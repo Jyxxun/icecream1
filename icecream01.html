@@ -198,6 +198,13 @@
             color: #ffffff;
             z-index: 150;
             animation: glow-pulse 1.5s ease-in-out infinite;
+            text-align: center;
+        }
+        .swipe-hint-sub {
+            font-size: 20px;
+            font-weight: normal;
+            display: block;
+            margin-top: 8px;
         }
         @keyframes glow-pulse {
             0% {
@@ -512,7 +519,10 @@
         <!-- Frame 4: Mouth Open -->
         <div id="frame4" class="frame" style="background-image: url('https://www.figma.com/api/mcp/asset/5ad6324b-e8d1-492f-a782-5461bbcd1213'); background-size: cover; background-position: center;">
             <div id="icecream-frame4" class="icecream-container"></div>
-            <div class="swipe-hint">Swipe up and down to eat^^</div>
+            <div class="swipe-hint">
+                Swipe up and down to eat^^
+                <span class="swipe-hint-sub">(Feel free to squish, stretch, or tap the ice cream!)</span>
+            </div>
         </div>
 
         <!-- Frame 5: Mouth Closed -->
