@@ -824,55 +824,68 @@
                 });
             }
 
-            // Add chewing animation to ice cream with progressive intensity
-            const currentFrame = document.getElementById(`frame${currentEatFrame}`);
-            const icecreamContainers = currentFrame.querySelectorAll('.icecream-container');
+            // Toggle between frames first
+            let newFrame;
+            if (currentEatFrame === 4) {
+                currentEatFrame = 5;
+                newFrame = 5;
+            } else {
+                currentEatFrame = 4;
+                newFrame = 4;
+            }
+            showFrame(newFrame);
 
-            // Calculate progressive stretch intensity based on eatCount
-            // Base values increase with each click
-            const stretchIntensity = Math.min(1 + (eatCount * 0.15), 3.5); // Max 3.5x intensity
+            // Add chewing animation to ice cream in the NEW frame with progressive intensity
+            // Wait a bit for frame switch to complete
+            setTimeout(() => {
+                const currentFrameElement = document.getElementById(`frame${newFrame}`);
+                const icecreamContainers = currentFrameElement.querySelectorAll('.icecream-container');
 
-            // Progressive squeeze (compress vertically, expand horizontally)
-            const squeezeX = 1 + (0.15 * stretchIntensity);
-            const squeezeY = Math.max(0.3, 1 - (0.35 * stretchIntensity));
+                // Calculate progressive stretch intensity based on eatCount (reduced for gentler effect)
+                const stretchIntensity = Math.min(1 + (eatCount * 0.08), 2.0); // Reduced: Max 2.0x intensity
 
-            // Progressive stretch (expand vertically, compress horizontally)
-            const stretchX = Math.max(0.4, 1 - (0.1 * stretchIntensity));
-            const stretchY = 1 + (0.3 * stretchIntensity);
+                // Progressive squeeze (compress vertically, expand horizontally) - gentler
+                const squeezeX = 1 + (0.1 * stretchIntensity);
+                const squeezeY = Math.max(0.5, 1 - (0.2 * stretchIntensity)); // Less extreme
 
-            // Bounce effects
-            const bounceX = 1 + (0.08 * stretchIntensity);
-            const bounceY = Math.max(0.5, 1 - (0.2 * stretchIntensity));
-            const bounce2X = Math.max(0.6, 1 - (0.04 * stretchIntensity));
-            const bounce2Y = 1 + (0.1 * stretchIntensity);
+                // Progressive stretch (expand vertically, compress horizontally) - gentler
+                const stretchX = Math.max(0.6, 1 - (0.06 * stretchIntensity)); // Less compression
+                const stretchY = 1 + (0.2 * stretchIntensity); // Less stretch
 
-            // Offset movement
-            const offset = Math.min(5 + eatCount * 1.5, 25); // Max 25% offset
+                // Bounce effects - gentler
+                const bounceX = 1 + (0.05 * stretchIntensity);
+                const bounceY = Math.max(0.7, 1 - (0.12 * stretchIntensity));
+                const bounce2X = Math.max(0.8, 1 - (0.03 * stretchIntensity));
+                const bounce2Y = 1 + (0.06 * stretchIntensity);
 
-            icecreamContainers.forEach(container => {
-                // Set CSS variables for this animation
-                container.style.setProperty('--chew-squeeze-x', squeezeX);
-                container.style.setProperty('--chew-squeeze-y', squeezeY);
-                container.style.setProperty('--chew-stretch-x', stretchX);
-                container.style.setProperty('--chew-stretch-y', stretchY);
-                container.style.setProperty('--chew-bounce-x', bounceX);
-                container.style.setProperty('--chew-bounce-y', bounceY);
-                container.style.setProperty('--chew-bounce2-x', bounce2X);
-                container.style.setProperty('--chew-bounce2-y', bounce2Y);
-                container.style.setProperty('--chew-offset', offset + '%');
+                // Offset movement - reduced
+                const offset = Math.min(3 + eatCount * 0.8, 15); // Max 15% offset
 
-                // Remove old animation class first to restart
-                container.classList.remove('chewing');
+                icecreamContainers.forEach(container => {
+                    // Set CSS variables for this animation
+                    container.style.setProperty('--chew-squeeze-x', squeezeX);
+                    container.style.setProperty('--chew-squeeze-y', squeezeY);
+                    container.style.setProperty('--chew-stretch-x', stretchX);
+                    container.style.setProperty('--chew-stretch-y', stretchY);
+                    container.style.setProperty('--chew-bounce-x', bounceX);
+                    container.style.setProperty('--chew-bounce-y', bounceY);
+                    container.style.setProperty('--chew-bounce2-x', bounce2X);
+                    container.style.setProperty('--chew-bounce2-y', bounce2Y);
+                    container.style.setProperty('--chew-offset', offset + '%');
 
-                // Force reflow to restart animation
-                void container.offsetWidth;
-
-                container.classList.add('chewing');
-                // Remove the class after animation completes
-                setTimeout(() => {
+                    // Remove old animation class first to restart
                     container.classList.remove('chewing');
-                }, 600);
-            });
+
+                    // Force reflow to restart animation
+                    void container.offsetWidth;
+
+                    container.classList.add('chewing');
+                    // Remove the class after animation completes
+                    setTimeout(() => {
+                        container.classList.remove('chewing');
+                    }, 600);
+                });
+            }, 50); // Small delay to ensure frame is visible
 
             // Randomize ice cream position with each toggle
             randomizeIcecreamPosition();
@@ -906,15 +919,6 @@
 
             for (let i = 0; i < wordsToAdd; i++) {
                 setTimeout(() => addWordPopup(), i * staggerTime);
-            }
-
-            // Toggle between frames without ever returning to start
-            if (currentEatFrame === 4) {
-                currentEatFrame = 5;
-                showFrame(5);
-            } else {
-                currentEatFrame = 4;
-                showFrame(4);
             }
         }
 
