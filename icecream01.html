@@ -141,12 +141,12 @@
             animation: chew 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         @keyframes chew {
-            0% { transform: translate(-50%, -50%) scale(1, 1); }
-            20% { transform: translate(-50%, calc(-50% + var(--chew-offset, 5%))) scale(var(--chew-squeeze-x, 1.15), var(--chew-squeeze-y, 0.65)); }
-            40% { transform: translate(-50%, calc(-50% - var(--chew-offset, 5%))) scale(var(--chew-stretch-x, 0.9), var(--chew-stretch-y, 1.3)); }
-            60% { transform: translate(-50%, calc(-50% + var(--chew-offset, 3%))) scale(var(--chew-bounce-x, 1.08), var(--chew-bounce-y, 0.8)); }
-            80% { transform: translate(-50%, calc(-50% - var(--chew-offset, 2%))) scale(var(--chew-bounce2-x, 0.96), var(--chew-bounce2-y, 1.1)); }
-            100% { transform: translate(-50%, -50%) scale(1, 1); }
+            0% { transform: translate(-50%, -50%) scale(var(--base-scale-x, 1), var(--base-scale-y, 1)); }
+            20% { transform: translate(-50%, calc(-50% + var(--chew-offset, 5%))) scale(calc(var(--base-scale-x, 1) * var(--chew-squeeze-x, 1.15)), calc(var(--base-scale-y, 1) * var(--chew-squeeze-y, 0.65))); }
+            40% { transform: translate(-50%, calc(-50% - var(--chew-offset, 5%))) scale(calc(var(--base-scale-x, 1) * var(--chew-stretch-x, 0.9)), calc(var(--base-scale-y, 1) * var(--chew-stretch-y, 1.3))); }
+            60% { transform: translate(-50%, calc(-50% + var(--chew-offset, 3%))) scale(calc(var(--base-scale-x, 1) * var(--chew-bounce-x, 1.08)), calc(var(--base-scale-y, 1) * var(--chew-bounce-y, 0.8))); }
+            80% { transform: translate(-50%, calc(-50% - var(--chew-offset, 2%))) scale(calc(var(--base-scale-x, 1) * var(--chew-bounce2-x, 0.96)), calc(var(--base-scale-y, 1) * var(--chew-bounce2-y, 1.1))); }
+            100% { transform: translate(-50%, -50%) scale(var(--base-scale-x, 1), var(--base-scale-y, 1)); }
         }
         .word-popup {
             position: absolute;
@@ -835,11 +835,14 @@
             }
             showFrame(newFrame);
 
-            // Add chewing animation to ice cream in the NEW frame with progressive intensity
+            // Add chewing animation to ice cream with progressive intensity
             // Wait a bit for frame switch to complete
             setTimeout(() => {
-                const currentFrameElement = document.getElementById(`frame${newFrame}`);
-                const icecreamContainers = currentFrameElement.querySelectorAll('.icecream-container');
+                // Calculate cumulative flattening based on eatCount
+                // Ice cream gets progressively flatter with each click
+                const flattenAmount = Math.min(eatCount * 0.04, 0.6); // Max 60% reduction in height
+                const baseScaleY = Math.max(0.4, 1 - flattenAmount); // Gets flatter
+                const baseScaleX = 1 + flattenAmount * 0.5; // Gets wider to compensate
 
                 // Calculate progressive stretch intensity based on eatCount (reduced for gentler effect)
                 const stretchIntensity = Math.min(1 + (eatCount * 0.08), 2.0); // Reduced: Max 2.0x intensity
@@ -861,8 +864,15 @@
                 // Offset movement - reduced
                 const offset = Math.min(3 + eatCount * 0.8, 15); // Max 15% offset
 
-                icecreamContainers.forEach(container => {
-                    // Set CSS variables for this animation
+                // Update ice cream in BOTH frames to keep them in sync
+                const allIcecreamContainers = document.querySelectorAll('#frame4 .icecream-container, #frame5 .icecream-container');
+
+                allIcecreamContainers.forEach(container => {
+                    // Set base flattened state (permanent change)
+                    container.style.transition = 'transform 0.3s ease-out';
+                    container.style.transform = `translate(-50%, -50%) scale(${baseScaleX}, ${baseScaleY})`;
+
+                    // Set CSS variables for chewing animation (temporary bounce)
                     container.style.setProperty('--chew-squeeze-x', squeezeX);
                     container.style.setProperty('--chew-squeeze-y', squeezeY);
                     container.style.setProperty('--chew-stretch-x', stretchX);
@@ -873,6 +883,16 @@
                     container.style.setProperty('--chew-bounce2-y', bounce2Y);
                     container.style.setProperty('--chew-offset', offset + '%');
 
+                    // Apply base scale values to animation
+                    container.style.setProperty('--base-scale-x', baseScaleX);
+                    container.style.setProperty('--base-scale-y', baseScaleY);
+                });
+
+                // Only animate the NEW frame's ice cream
+                const currentFrameElement = document.getElementById(`frame${newFrame}`);
+                const newFrameContainers = currentFrameElement.querySelectorAll('.icecream-container');
+
+                newFrameContainers.forEach(container => {
                     // Remove old animation class first to restart
                     container.classList.remove('chewing');
 
