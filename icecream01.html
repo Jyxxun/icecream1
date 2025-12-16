@@ -142,10 +142,10 @@
         }
         @keyframes chew {
             0% { transform: translate(-50%, -50%) scale(1, 1); }
-            20% { transform: translate(-50%, -45%) scale(1.15, 0.65); }
-            40% { transform: translate(-50%, -55%) scale(0.9, 1.3); }
-            60% { transform: translate(-50%, -48%) scale(1.08, 0.8); }
-            80% { transform: translate(-50%, -52%) scale(0.96, 1.1); }
+            20% { transform: translate(-50%, calc(-50% + var(--chew-offset, 5%))) scale(var(--chew-squeeze-x, 1.15), var(--chew-squeeze-y, 0.65)); }
+            40% { transform: translate(-50%, calc(-50% - var(--chew-offset, 5%))) scale(var(--chew-stretch-x, 0.9), var(--chew-stretch-y, 1.3)); }
+            60% { transform: translate(-50%, calc(-50% + var(--chew-offset, 3%))) scale(var(--chew-bounce-x, 1.08), var(--chew-bounce-y, 0.8)); }
+            80% { transform: translate(-50%, calc(-50% - var(--chew-offset, 2%))) scale(var(--chew-bounce2-x, 0.96), var(--chew-bounce2-y, 1.1)); }
             100% { transform: translate(-50%, -50%) scale(1, 1); }
         }
         .word-popup {
@@ -824,10 +824,49 @@
                 });
             }
 
-            // Add chewing animation to ice cream
+            // Add chewing animation to ice cream with progressive intensity
             const currentFrame = document.getElementById(`frame${currentEatFrame}`);
             const icecreamContainers = currentFrame.querySelectorAll('.icecream-container');
+
+            // Calculate progressive stretch intensity based on eatCount
+            // Base values increase with each click
+            const stretchIntensity = Math.min(1 + (eatCount * 0.15), 3.5); // Max 3.5x intensity
+
+            // Progressive squeeze (compress vertically, expand horizontally)
+            const squeezeX = 1 + (0.15 * stretchIntensity);
+            const squeezeY = Math.max(0.3, 1 - (0.35 * stretchIntensity));
+
+            // Progressive stretch (expand vertically, compress horizontally)
+            const stretchX = Math.max(0.4, 1 - (0.1 * stretchIntensity));
+            const stretchY = 1 + (0.3 * stretchIntensity);
+
+            // Bounce effects
+            const bounceX = 1 + (0.08 * stretchIntensity);
+            const bounceY = Math.max(0.5, 1 - (0.2 * stretchIntensity));
+            const bounce2X = Math.max(0.6, 1 - (0.04 * stretchIntensity));
+            const bounce2Y = 1 + (0.1 * stretchIntensity);
+
+            // Offset movement
+            const offset = Math.min(5 + eatCount * 1.5, 25); // Max 25% offset
+
             icecreamContainers.forEach(container => {
+                // Set CSS variables for this animation
+                container.style.setProperty('--chew-squeeze-x', squeezeX);
+                container.style.setProperty('--chew-squeeze-y', squeezeY);
+                container.style.setProperty('--chew-stretch-x', stretchX);
+                container.style.setProperty('--chew-stretch-y', stretchY);
+                container.style.setProperty('--chew-bounce-x', bounceX);
+                container.style.setProperty('--chew-bounce-y', bounceY);
+                container.style.setProperty('--chew-bounce2-x', bounce2X);
+                container.style.setProperty('--chew-bounce2-y', bounce2Y);
+                container.style.setProperty('--chew-offset', offset + '%');
+
+                // Remove old animation class first to restart
+                container.classList.remove('chewing');
+
+                // Force reflow to restart animation
+                void container.offsetWidth;
+
                 container.classList.add('chewing');
                 // Remove the class after animation completes
                 setTimeout(() => {
