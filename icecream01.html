@@ -137,6 +137,16 @@
         .icecream-container:hover {
             animation-play-state: paused;
         }
+        .icecream-container.chewing {
+            animation: chew 0.4s cubic-bezier(0.68, -0.35, 0.265, 1.35);
+        }
+        @keyframes chew {
+            0% { transform: translate(-50%, -50%) scale(1, 1); }
+            25% { transform: translate(-50%, -45%) scale(1.1, 0.7); }
+            50% { transform: translate(-50%, -50%) scale(0.95, 1.2); }
+            75% { transform: translate(-50%, -48%) scale(1.05, 0.85); }
+            100% { transform: translate(-50%, -50%) scale(1, 1); }
+        }
         .word-popup {
             position: absolute;
             font-family: 'Impact', 'Arial Black', sans-serif;
@@ -812,6 +822,17 @@
                     console.log('Audio play failed:', err);
                 });
             }
+
+            // Add chewing animation to ice cream
+            const currentFrame = document.getElementById(`frame${currentEatFrame}`);
+            const icecreamContainers = currentFrame.querySelectorAll('.icecream-container');
+            icecreamContainers.forEach(container => {
+                container.classList.add('chewing');
+                // Remove the class after animation completes
+                setTimeout(() => {
+                    container.classList.remove('chewing');
+                }, 400);
+            });
 
             // Randomize ice cream position with each toggle
             randomizeIcecreamPosition();
