@@ -408,13 +408,11 @@
         <!-- Frame 4: Mouth Open -->
         <div id="frame4" class="frame" style="background-image: url('https://www.figma.com/api/mcp/asset/5ad6324b-e8d1-492f-a782-5461bbcd1213'); background-size: cover; background-position: center;">
             <div id="icecream-frame4" class="icecream-container"></div>
-            <button onclick="toggleEating()" style="left: 602px; top: 665px;">Eat Me!</button>
         </div>
 
         <!-- Frame 5: Mouth Closed -->
         <div id="frame5" class="frame" style="background-image: url('https://www.figma.com/api/mcp/asset/9b33751d-eee4-458b-984b-79b7443301c1'); background-size: cover; background-position: center;">
             <div id="icecream-frame5" class="icecream-container"></div>
-            <button onclick="toggleEating()" style="left: 602px; top: 665px;">Eat Me!</button>
         </div>
     </div>
 
@@ -1002,6 +1000,39 @@
                     }, { once: true });
                 });
             }
+
+            // Add mouse wheel scroll interaction for eating frames
+            let isScrolling = false;
+            let scrollTimeout;
+
+            window.addEventListener('wheel', function(e) {
+                // Only respond to scroll when in eating mode (frame 4 or 5)
+                const frame4 = document.getElementById('frame4');
+                const frame5 = document.getElementById('frame5');
+
+                if (!frame4.classList.contains('active') && !frame5.classList.contains('active')) {
+                    return; // Not in eating frames
+                }
+
+                // Prevent default scroll behavior
+                e.preventDefault();
+
+                // Throttle: only trigger once per scroll gesture
+                if (isScrolling) {
+                    return;
+                }
+
+                isScrolling = true;
+
+                // Toggle eating on any scroll (up or down)
+                toggleEating();
+
+                // Reset throttle after a short delay
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                }, 300); // 300ms cooldown between toggles
+            }, { passive: false });
         });
     </script>
 </body>
